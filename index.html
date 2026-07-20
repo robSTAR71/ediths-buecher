@@ -166,7 +166,7 @@ body { background: #f0ece3; color: var(--text); font-family: var(--sans); min-he
   </div>
 </div>
 
-<div id="detailOverlay" class="overlay" style="display:none">
+<div id="detailOverlay" class="overlay" style="display:none" onclick="if(event.target===this)closeDetail()">
   <div class="panel" id="detailPanel">
     <div class="panel-drag"></div>
     <div id="detailContent"></div>
@@ -445,7 +445,7 @@ function renderBibliothek() {
   var genres = ["Alle","Krimi","Thriller","Nordischer Krimi","Historisch","Sonstiges"];
   var pillsHtml = "";
   for (var i = 0; i < genres.length; i++) {
-    pillsHtml += '<button class="pill' + (activeFilter === genres[i] ? " active" : "") + '" onclick="setFilter(\"' + genres[i] + '\")">' + genres[i] + '</button>';
+            pillsHtml += '<button class="pill' + (activeFilter === genres[i] ? ' active' : '') + '" data-g="' + genres[i] + '" onclick="setFilter(this.getAttribute(\"data-g\"))">' + genres[i] + '</button>';
   }
   document.getElementById("filterPills").innerHTML = pillsHtml;
 
@@ -562,59 +562,134 @@ function openDetail(id) {
 }
 
 function loadBookData(book) {
+  var dDesc = document.getElementById("dDesc");
+  var dCover = document.getElementById("dCover");
+  if (!dDesc || !dCover) return;
+
+  // Search Google Books with title + author for precise match
   var xhr = new XMLHttpRequest();
-  var q = encodeURIComponent(book.title + " " + book.author);
-  xhr.open("GET", "https://www.googleapis.com/books/v1/volumes?q=" + q + "&maxResults=3", true);
+  var q = encodeURIComponent("intitle:" + book.title + " inauthor:" + book.author);
+  var url = "https://www.googleapis.com/books/v1/volumes?q=" + q + "&maxResults=5&langRestrict=de";
+  xhr.open("GET", url, true);
+  xhr.timeout = 10000;
   xhr.onreadystatechange = function() {
     if (xhr.readyState !== 4) return;
-    var dDesc = document.getElementById("dDesc");
-    if (!dDesc) return;
+    var el = document.getElementById("dDesc");
+    var coverEl = document.getElementById("dCover");
+    if (!el) return;
     if (xhr.status === 200) {
       try {
         var data = JSON.parse(xhr.responseText);
-        var cover = "", desc = "";
+        var desc = "", cover = "";
         if (data.totalItems > 0) {
-          for (var i = 0; i < data.items.length; i++) {
-            var info = data.items[i].volumeInfo;
-            if (!cover && info.imageLinks) {
-              cover = (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail || "").replace("http://", "https://");
+          // Prefer items where author name matches
+          var items = data.items;
+          var bestItem = null;
+          var authorLower = book.author.toLowerCase();
+          // First pass: look for author match
+          for (var i = 0; i < items.length; i++) {
+            var info = items[i].volumeInfo;
+            var authors = info.authors || [];
+            for (var j = 0; j < authors.length; j++) {
+              if (authors[j].toLowerCase().indexOf(authorLower.split(" ")[authorLower.split(" ").length-1]) >= 0) {
+                bestItem = info; break;
+              }
             }
-            if (!desc && info.description) {
-              desc = info.description;
-              if (desc.length > 450) desc = desc.substring(0, 450) + " ...";
+            if (bestItem) break;
+          }
+          // Fallback: use first result
+          if (!bestItem && items.length > 0) bestItem = items[0].volumeInfo;
+          if (bestItem) {
+            if (bestItem.description) {
+              desc = bestItem.description;
+              if (desc.length > 500) desc = desc.substring(0, 500) + " ...";
             }
-            if (cover && desc) break;
+            if (bestItem.imageLinks) {
+              cover = (bestItem.imageLinks.thumbnail || bestItem.imageLinks.smallThumbnail || "").replace("http://", "https://");
+            }
           }
         }
-        var result = {cover: cover, desc: desc};
-        detailCache[book.id] = result;
-        applyDetailData(result);
+        // Also try without langRestrict if no desc found
+        detailCache[book.id] = {cover: cover, desc: desc};
+        if (el) {
+          el.className = desc ? "d-desc" : "d-loading";
+          el.textContent = desc || "Keine Beschreibung verf\u00fcgbar.";
+        }
+        if (cover && coverEl) {
+          var img = document.createElement("img");
+          img.alt = "Cover";
+          img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:8px";
+          img.onerror = function() {
+            // Fallback to Open Library by title
+            var img2 = document.createElement("img");
+            img2.alt = "Cover";
+            img2.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:8px";
+            img2.onerror = function() { if(coverEl) coverEl.textContent = "\ud83d\udcda"; };
+            img2.src = "https://covers.openlibrary.org/b/title/" + encodeURIComponent(book.title) + "-M.jpg";
+            if(coverEl) { coverEl.innerHTML=""; coverEl.appendChild(img2); }
+          };
+          img.src = cover;
+          coverEl.innerHTML = "";
+          coverEl.appendChild(img);
+        } else if (!cover && coverEl) {
+          // No Google Books cover - try Open Library
+          var img3 = document.createElement("img");
+          img3.alt = "Cover";
+          img3.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:8px";
+          img3.onerror = function() { if(coverEl) coverEl.textContent = "\ud83d\udcda"; };
+          img3.src = "https://covers.openlibrary.org/b/title/" + encodeURIComponent(book.title) + "-M.jpg";
+          coverEl.innerHTML = "";
+          coverEl.appendChild(img3);
+        }
+        // If still no description, retry without language restriction
+        if (!desc) {
+          var xhr2 = new XMLHttpRequest();
+          var q2 = encodeURIComponent("intitle:" + book.title + " inauthor:" + book.author);
+          xhr2.open("GET", "https://www.googleapis.com/books/v1/volumes?q=" + q2 + "&maxResults=5", true);
+          xhr2.timeout = 8000;
+          xhr2.onreadystatechange = function() {
+            if (xhr2.readyState !== 4) return;
+            var el2 = document.getElementById("dDesc");
+            if (!el2 || el2.textContent !== "Keine Beschreibung verf\u00fcgbar.") return;
+            if (xhr2.status === 200) {
+              try {
+                var d2 = JSON.parse(xhr2.responseText);
+                if (d2.totalItems > 0) {
+                  var authorLower2 = book.author.toLowerCase();
+                  var lastName = authorLower2.split(" ")[authorLower2.split(" ").length-1];
+                  for (var k = 0; k < d2.items.length; k++) {
+                    var inf2 = d2.items[k].volumeInfo;
+                    var auths2 = inf2.authors || [];
+                    var authorMatch = false;
+                    for (var m = 0; m < auths2.length; m++) {
+                      if (auths2[m].toLowerCase().indexOf(lastName) >= 0) { authorMatch = true; break; }
+                    }
+                    if ((authorMatch || k===0) && inf2.description) {
+                      var d = inf2.description;
+                      if (d.length > 500) d = d.substring(0, 500) + " ...";
+                      el2.className = "d-desc";
+                      el2.textContent = d;
+                      break;
+                    }
+                  }
+                }
+              } catch(e2) {}
+            }
+          };
+          xhr2.send();
+        }
       } catch(e) {
-        dDesc.className = "d-loading";
-        dDesc.textContent = "Fehler beim Laden.";
+        if (el) { el.className = "d-loading"; el.textContent = "Fehler beim Laden."; }
       }
     } else {
-      dDesc.className = "d-loading";
-      dDesc.textContent = "Keine Verbindung.";
+      if (el) { el.className = "d-loading"; el.textContent = "Keine Beschreibung verf\u00fcgbar."; }
     }
   };
+  xhr.ontimeout = function() {
+    var el = document.getElementById("dDesc");
+    if (el) { el.className = "d-loading"; el.textContent = "Zeitüberschreitung."; }
+  };
   xhr.send();
-}
-
-function applyDetailData(result) {
-  var dCover = document.getElementById("dCover");
-  var dDesc = document.getElementById("dDesc");
-  if (!dCover || !dDesc) return;
-  if (result.cover) {
-    var img = document.createElement("img");
-    img.alt = "Cover";
-    img.onerror = function() { dCover.textContent = "??"; };
-    img.src = result.cover;
-    dCover.innerHTML = "";
-    dCover.appendChild(img);
-  }
-  dDesc.className = result.desc ? "d-desc" : "d-loading";
-  dDesc.textContent = result.desc || "Keine Beschreibung verfügbar.";
 }
 
 function toggleFavDetail(id) {
