@@ -7,18 +7,11 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f5f0e8;
-  --bg2: #ede8de;
-  --bg3: rgba(220,210,190,0.95);
-  --gold: #8a6a20;
-  --gold2: #6b4f10;
-  --gold3: #7a5515;
-  --text: #1a1208;
-  --muted: #5a6670;
-  --card: rgba(255,252,246,0.97);
-  --border: rgba(100,80,30,0.18);
-  --radius: 12px;
-  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --bg: #f5f0e8; --bg2: #ede8de; --bg3: rgba(220,210,190,0.95);
+  --gold: #8a6a20; --gold2: #6b4f10; --gold3: #7a5515;
+  --text: #1a1208; --muted: #5a6670;
+  --card: rgba(255,252,246,0.97); --border: rgba(100,80,30,0.18);
+  --radius: 12px; --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --serif: Georgia, 'Times New Roman', serif;
 }
 body { background: #f0ece3; color: var(--text); font-family: var(--sans); min-height: 100vh; font-size: 15px; }
@@ -48,11 +41,10 @@ body { background: #f0ece3; color: var(--text); font-family: var(--sans); min-he
 .author-count { font-size: 11px; color: var(--muted); background: var(--bg3); padding: 2px 7px; border-radius: 10px; border: 1px solid var(--border); }
 .series-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--gold3); margin: 8px 0 5px 2px; }
 .books-grid { display: flex; flex-direction: column; gap: 5px; }
-.book-card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+.book-card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .book-num { width: 26px; height: 26px; background: var(--bg3); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gold); font-weight: 600; flex-shrink: 0; }
 .book-title-text { font-size: 13px; color: var(--text); flex: 1; }
 .book-rating { font-size: 11px; color: var(--gold); }
-.book-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
 .book-fav { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--muted); padding: 4px; -webkit-tap-highlight-color: transparent; }
 .book-fav.active { color: var(--gold); }
 .gbadge { display: inline-block; font-size: 9px; padding: 2px 6px; border-radius: 8px; margin-right: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2px; }
@@ -87,13 +79,30 @@ body { background: #f0ece3; color: var(--text); font-family: var(--sans); min-he
 .divider { display: flex; align-items: center; gap: 8px; margin: 16px 0 12px; }
 .divider span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.7px; white-space: nowrap; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* Detail Panel */
+.overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 500; display: flex; align-items: flex-end; }
+.panel { background: var(--bg); width: 100%; max-height: 82vh; border-radius: 20px 20px 0 0; overflow-y: auto; padding: 20px 18px 36px; }
+.panel-drag { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.d-header { display: flex; gap: 14px; margin-bottom: 14px; }
+.d-cover { width: 80px; min-width: 80px; height: 115px; border-radius: 8px; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; flex-shrink: 0; }
+.d-cover img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.d-title { font-family: var(--serif); font-size: 16px; color: var(--gold2); font-weight: bold; margin-bottom: 4px; }
+.d-author { font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+.d-series { font-size: 12px; color: var(--gold3); margin-bottom: 5px; }
+.d-desc { font-size: 13px; color: var(--text); line-height: 1.65; margin-bottom: 14px; }
+.d-loading { font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 14px; }
+.d-note { background: var(--bg3); border-radius: 8px; padding: 10px 12px; font-size: 13px; color: var(--text); margin-bottom: 14px; }
+.d-btn-row { display: flex; gap: 8px; }
+.d-btn { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 9px; padding: 11px 8px; font-size: 13px; cursor: pointer; color: var(--text); -webkit-tap-highlight-color: transparent; }
+.d-btn.fav-active { background: #fff8e0; border-color: var(--gold); color: var(--gold); }
+.d-btn.close-btn { background: var(--gold3); color: #fff; border-color: var(--gold3); }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-title">&#128218; Ediths Bücher</div>
-  <div class="header-sub">Meine persönliche Bibliothek</div>
+  <div class="header-title">&#128218; Ediths B&#252;cher</div>
+  <div class="header-sub">Meine pers&#246;nliche Bibliothek</div>
   <div class="search-wrap">
     <span class="search-icon">&#128269;</span>
     <input class="search-input" type="search" id="searchInput" placeholder="Buch oder Autor suchen ..." oninput="applyFilters()">
@@ -102,40 +111,25 @@ body { background: #f0ece3; color: var(--text); font-family: var(--sans); min-he
 
 <nav class="nav">
   <button class="nav-btn active" id="btn-bibliothek" onclick="showTab('bibliothek')">&#128218; Bibliothek</button>
-  <button class="nav-btn" id="btn-hinzufuegen" onclick="showTab('hinzufuegen')">&#43; Hinzufügen</button>
+  <button class="nav-btn" id="btn-hinzufuegen" onclick="showTab('hinzufuegen')">&#43; Hinzuf&#252;gen</button>
   <button class="nav-btn" id="btn-favoriten" onclick="showTab('favoriten')">&#11088; Favoriten</button>
   <button class="nav-btn" id="btn-tipps" onclick="showTab('tipps')">&#128161; Tipps</button>
 </nav>
 
 <div class="main">
-
   <div id="tab-bibliothek">
     <div class="stats-row" id="statsRow"></div>
     <div class="filter-pills" id="filterPills"></div>
     <div id="bookList"></div>
   </div>
-
   <div id="tab-hinzufuegen" style="display:none">
     <div class="form-section">
       <h3>Neues Buch eintragen</h3>
-      <div class="form-group">
-        <label class="form-label">Titel</label>
-        <input class="form-input" type="text" id="newTitle" placeholder="Buchtitel ...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Autor</label>
-        <input class="form-input" type="text" id="newAuthor" placeholder="Autorenname ...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Reihe (optional)</label>
-        <input class="form-input" type="text" id="newSeries" placeholder="z.B. Kendra Elliott – Callahan &amp; McLane">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Band-Nummer</label>
-        <input class="form-input" type="number" id="newBand" placeholder="z.B. 1" min="1">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Genre</label>
+      <div class="form-group"><label class="form-label">Titel</label><input class="form-input" type="text" id="newTitle" placeholder="Buchtitel ..."></div>
+      <div class="form-group"><label class="form-label">Autor</label><input class="form-input" type="text" id="newAuthor" placeholder="Autorenname ..."></div>
+      <div class="form-group"><label class="form-label">Reihe (optional)</label><input class="form-input" type="text" id="newSeries" placeholder="z.B. Callahan &amp; McLane"></div>
+      <div class="form-group"><label class="form-label">Band-Nummer</label><input class="form-input" type="number" id="newBand" placeholder="z.B. 1" min="1"></div>
+      <div class="form-group"><label class="form-label">Genre</label>
         <select class="form-select" id="newGenre">
           <option value="Krimi">Krimi</option>
           <option value="Thriller">Thriller</option>
@@ -144,8 +138,7 @@ body { background: #f0ece3; color: var(--text); font-family: var(--sans); min-he
           <option value="Sonstiges">Sonstiges</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Bewertung</label>
+      <div class="form-group"><label class="form-label">Bewertung</label>
         <div class="star-row">
           <button class="star-btn" onclick="setRating(1)">&#9733;</button>
           <button class="star-btn" onclick="setRating(2)">&#9733;</button>
@@ -154,232 +147,228 @@ body { background: #f0ece3; color: var(--text); font-family: var(--sans); min-he
           <button class="star-btn" onclick="setRating(5)">&#9733;</button>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Notiz (optional)</label>
-        <textarea class="form-textarea" id="newNote" placeholder="Meine Gedanken zum Buch ..."></textarea>
-      </div>
-      <button class="btn-primary" onclick="addBook()">&#128218; Buch hinzufügen</button>
+      <div class="form-group"><label class="form-label">Notiz (optional)</label><textarea class="form-textarea" id="newNote" placeholder="Meine Gedanken zum Buch ..."></textarea></div>
+      <button class="btn-primary" onclick="addBook()">&#128218; Buch hinzuf&#252;gen</button>
     </div>
   </div>
-
   <div id="tab-favoriten" style="display:none">
     <div class="divider"><span>Meine Lieblinge &#11088;</span></div>
     <div id="favList"></div>
   </div>
-
   <div id="tab-tipps" style="display:none">
     <div class="tips-card">
       <h4>&#128202; Dein Leserprofil</h4>
       <div class="profile-ring" id="profileRing"></div>
-      <div style="font-size:12px;color:var(--muted)">Basierend auf <span id="profileTotal">0</span> Büchern.</div>
+      <div style="font-size:12px;color:var(--muted)">Basierend auf <span id="profileTotal">0</span> B&#252;chern.</div>
     </div>
-    <div class="tips-card">
-      <h4>&#128161; Empfehlungen für dich</h4>
-      <div id="tipsList"></div>
-    </div>
-    <div class="tips-card">
-      <h4>&#128507; Deine Lesereise</h4>
-      <div id="mapTips" style="font-size:13px;color:var(--text);line-height:1.7"></div>
-    </div>
+    <div class="tips-card"><h4>&#128161; Empfehlungen f&#252;r dich</h4><div id="tipsList"></div></div>
+    <div class="tips-card"><h4>&#128507; Deine Lesereise</h4><div id="mapTips" style="font-size:13px;color:var(--text);line-height:1.7"></div></div>
   </div>
+</div>
 
+<div id="detailOverlay" class="overlay" style="display:none">
+  <div class="panel" id="detailPanel">
+    <div class="panel-drag"></div>
+    <div id="detailContent"></div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 var BOOKS = [
-{id:1,author:"Kendra Elliott",series:"Callahan & McLane",band:1,title:"Verschwunden",genre:"Thriller",fav:false,rating:0,note:""},
-{id:2,author:"Kendra Elliott",series:"Callahan & McLane",band:2,title:"Verbunden",genre:"Thriller",fav:false,rating:0,note:""},
-{id:3,author:"Kendra Elliott",series:"Callahan & McLane",band:3,title:"Abgestürzt",genre:"Thriller",fav:false,rating:0,note:""},
-{id:4,author:"Kendra Elliott",series:"Callahan & McLane",band:4,title:"Im Visier",genre:"Thriller",fav:false,rating:0,note:""},
-{id:5,author:"Kendra Elliott",series:"Columbia River",band:1,title:"Die verschollene Schwester",genre:"Thriller",fav:false,rating:0,note:""},
-{id:6,author:"Kendra Elliott",series:"Columbia River",band:2,title:"Die verhängnisvolle Stille",genre:"Thriller",fav:false,rating:0,note:""},
-{id:7,author:"Kendra Elliott",series:"Columbia River",band:3,title:"Die verzweifelte Suche",genre:"Thriller",fav:false,rating:0,note:""},
-{id:8,author:"Kendra Elliott",series:"Bone Secrets",band:1,title:"Verdeckt",genre:"Thriller",fav:false,rating:0,note:""},
-{id:9,author:"Kendra Elliott",series:"Bone Secrets",band:2,title:"Vereist",genre:"Thriller",fav:false,rating:0,note:""},
-{id:10,author:"Kendra Elliott",series:"Bone Secrets",band:3,title:"Verscharrt",genre:"Thriller",fav:false,rating:0,note:""},
-{id:11,author:"Kendra Elliott",series:"Bone Secrets",band:4,title:"Verraten",genre:"Thriller",fav:false,rating:0,note:""},
-{id:12,author:"Kendra Elliott",series:"Bone Secrets",band:5,title:"Verbrannt",genre:"Thriller",fav:false,rating:0,note:""},
-{id:13,author:"Kendra Elliott",series:"Mercy Kill Patrick",band:1,title:"Erbarme dich ihrer",genre:"Thriller",fav:false,rating:0,note:""},
-{id:14,author:"Kendra Elliott",series:"Mercy Kill Patrick",band:2,title:"Erkenne die Wahrheit",genre:"Thriller",fav:false,rating:0,note:""},
-{id:15,author:"Kendra Elliott",series:"Mercy Kill Patrick",band:3,title:"Verzeiht meine Sünden",genre:"Thriller",fav:false,rating:0,note:""},
-{id:16,author:"Melinda Leigh",series:"Bree Taggert",band:1,title:"Dunkle Last",genre:"Thriller",fav:false,rating:0,note:""},
-{id:17,author:"Melinda Leigh",series:"Bree Taggert",band:2,title:"Eisige Wut",genre:"Thriller",fav:false,rating:0,note:""},
-{id:18,author:"Melinda Leigh",series:"Bree Taggert",band:3,title:"Teuflische Gier",genre:"Thriller",fav:false,rating:0,note:""},
-{id:19,author:"Melinda Leigh",series:"Bree Taggert",band:4,title:"Tödliches Leid",genre:"Thriller",fav:false,rating:0,note:""},
-{id:20,author:"Ben Tomasson",series:"",band:1,title:"Forsberg und das verschwundene Mädchen",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:21,author:"Ben Tomasson",series:"",band:2,title:"Der Tote von Asperö",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:22,author:"Ben Tomasson",series:"",band:3,title:"Der Teufel von Björnlanda",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:23,author:"Ben Tomasson",series:"",band:4,title:"Die Schatten von Trollhädan",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:24,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:1,title:"Die Springflut",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:25,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:2,title:"Die dritte Stimme",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:26,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:3,title:"Strömung",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:27,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:4,title:"Schlaflied",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:28,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:5,title:"Wundbrand",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:29,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:6,title:"Kaltes Gold",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:30,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:7,title:"Der gute Samariter",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:31,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:8,title:"Das Auge der Nacht",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:32,author:"Cilla Börjlind",series:"Olivia Ronning & Tom Stilton",band:9,title:"Schatten über dem Wald",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:33,author:"Volker Gerling",series:"Laura Graf",band:1,title:"Der Perfektionist",genre:"Krimi",fav:false,rating:0,note:""},
-{id:34,author:"Volker Gerling",series:"Laura Graf",band:2,title:"Die Schuldigen",genre:"Krimi",fav:false,rating:0,note:""},
-{id:35,author:"Volker Gerling",series:"Laura Graf",band:3,title:"Der Seelsorger",genre:"Krimi",fav:false,rating:0,note:""},
-{id:36,author:"Andrea Penrose",series:"Wrexford & Sloane",band:1,title:"Der Tote in der Black Swan Lane",genre:"Historisch",fav:false,rating:0,note:""},
-{id:37,author:"Andrea Penrose",series:"Wrexford & Sloane",band:3,title:"Schatten über Kensington Palace",genre:"Historisch",fav:false,rating:0,note:""},
-{id:38,author:"Lloreth Anne White",series:"",band:1,title:"Die Geheimnisse der anderen",genre:"Thriller",fav:false,rating:0,note:""},
-{id:39,author:"Lloreth Anne White",series:"",band:2,title:"In dunkler Tiefe",genre:"Thriller",fav:false,rating:0,note:""},
-{id:40,author:"Lloreth Anne White",series:"",band:3,title:"Mädchen Fang",genre:"Thriller",fav:false,rating:0,note:""},
-{id:41,author:"Lloreth Anne White",series:"",band:4,title:"Mädchen Grab",genre:"Thriller",fav:false,rating:0,note:""},
-{id:42,author:"Catherine Shepard",series:"Zons-Reihe",band:1,title:"Düsteres Wasser",genre:"Krimi",fav:false,rating:0,note:""},
-{id:43,author:"Catherine Shepard",series:"Zons-Reihe",band:2,title:"Das Wiegenlied",genre:"Krimi",fav:false,rating:0,note:""},
-{id:44,author:"Catherine Shepard",series:"Zons-Reihe",band:3,title:"Dunkle Botschaft",genre:"Krimi",fav:false,rating:0,note:""},
-{id:45,author:"Catherine Shepard",series:"Zons-Reihe",band:4,title:"Das Verbot",genre:"Krimi",fav:false,rating:0,note:""},
-{id:46,author:"Catherine Shepard",series:"Zons-Reihe",band:5,title:"Das Geheimnis der toten Mädchen",genre:"Krimi",fav:false,rating:0,note:""},
-{id:47,author:"Samuel Björk",series:"",band:1,title:"Dunkler Schnee",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:48,author:"Samuel Björk",series:"",band:2,title:"Engelsskald",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:49,author:"Samuel Björk",series:"",band:3,title:"Federgrab",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:50,author:"Samuel Björk",series:"",band:4,title:"Bitterer Abschied",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:51,author:"Samuel Björk",series:"",band:5,title:"Kräheninsel",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:52,author:"Andreas Winkelmann",series:"",band:1,title:"Das letzte was du hörst",genre:"Thriller",fav:false,rating:0,note:""},
-{id:53,author:"Andreas Winkelmann",series:"",band:2,title:"Nicht ein Wort zu viel",genre:"Thriller",fav:false,rating:0,note:""},
-{id:54,author:"Andreas Winkelmann",series:"",band:3,title:"Moorland",genre:"Thriller",fav:false,rating:0,note:""},
-{id:55,author:"Mark Dawson",series:"Isabella Rose",band:1,title:"Der Engel",genre:"Thriller",fav:false,rating:0,note:""},
-{id:56,author:"Mark Dawson",series:"Isabella Rose",band:2,title:"Die Agentin",genre:"Thriller",fav:false,rating:0,note:""},
-{id:57,author:"Mark Dawson",series:"Isabella Rose",band:3,title:"Kundschafterin",genre:"Thriller",fav:false,rating:0,note:""},
-{id:58,author:"Mark Dawson",series:"Isabella Rose",band:4,title:"Killerin",genre:"Thriller",fav:false,rating:0,note:""},
-{id:59,author:"Mark Dawson",series:"Isabella Rose",band:5,title:"Richterin",genre:"Thriller",fav:false,rating:0,note:""},
-{id:60,author:"Mark Dawson",series:"Atticus Priest",band:1,title:"Das Haus im Wald",genre:"Thriller",fav:false,rating:0,note:""},
-{id:61,author:"Mark Dawson",series:"Atticus Priest",band:2,title:"Friedhof für Fremde",genre:"Thriller",fav:false,rating:0,note:""},
-{id:62,author:"Mark Dawson",series:"Atticus Priest",band:3,title:"Das rote Zimmer",genre:"Thriller",fav:false,rating:0,note:""},
-{id:63,author:"Mark Dawson",series:"Atticus Priest",band:4,title:"Und alle Teufel",genre:"Thriller",fav:false,rating:0,note:""},
-{id:64,author:"Mark Dawson",series:"Atticus Priest",band:5,title:"Das Erbe",genre:"Thriller",fav:false,rating:0,note:""},
-{id:65,author:"Mark Franley",series:"David Bender & Katharina Adler",band:1,title:"Treibsand",genre:"Krimi",fav:false,rating:0,note:""},
-{id:66,author:"Mark Franley",series:"David Bender & Katharina Adler",band:2,title:"Irrlicht",genre:"Krimi",fav:false,rating:0,note:""},
-{id:67,author:"Mark Franley",series:"David Bender & Katharina Adler",band:3,title:"Ihr Kinderlein kommet",genre:"Krimi",fav:false,rating:0,note:""},
-{id:68,author:"Mark Franley",series:"David Bender & Katharina Adler",band:4,title:"Das Haus im Wald",genre:"Krimi",fav:false,rating:0,note:""},
-{id:69,author:"Christophe Villain",series:"Sandrine Perrot",band:1,title:"Die Tote auf dem Zöllnerweg",genre:"Krimi",fav:false,rating:0,note:""},
-{id:70,author:"Christophe Villain",series:"Sandrine Perrot",band:2,title:"Die Tote von Saint Malo",genre:"Krimi",fav:false,rating:0,note:""},
-{id:71,author:"Christophe Villain",series:"Sandrine Perrot",band:3,title:"Das Grab in der Ardeche",genre:"Krimi",fav:false,rating:0,note:""},
-{id:72,author:"Christophe Villain",series:"Sandrine Perrot",band:4,title:"Der Tote aus der Bücherstadt",genre:"Krimi",fav:false,rating:0,note:""},
-{id:73,author:"Christophe Villain",series:"Sandrine Perrot",band:5,title:"Der Tote in der Mühle",genre:"Krimi",fav:false,rating:0,note:""},
-{id:74,author:"Christophe Villain",series:"Sandrine Perrot",band:6,title:"Der Tote in der Burg",genre:"Krimi",fav:false,rating:0,note:""},
-{id:75,author:"Christophe Villain",series:"Kommissar Armand & David",band:1,title:"Das Grab in der Ade",genre:"Krimi",fav:false,rating:0,note:""},
-{id:76,author:"Christophe Villain",series:"Kommissar Armand & David",band:2,title:"Mord in der Unterwelt",genre:"Krimi",fav:false,rating:0,note:""},
-{id:77,author:"Christophe Villain",series:"Kommissar Armand & David",band:3,title:"Das Teil der Wölfe",genre:"Krimi",fav:false,rating:0,note:""},
-{id:78,author:"Christophe Villain",series:"Kommissar Armand & David",band:4,title:"Verhängnisvolles Carcassonne",genre:"Krimi",fav:false,rating:0,note:""},
-{id:79,author:"Jens Henrik Jensen",series:"East",band:1,title:"Welt ohne Seele",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:80,author:"Jens Henrik Jensen",series:"East",band:2,title:"Auf tiefem Grund",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:81,author:"Jens Henrik Jensen",series:"East",band:3,title:"Jagd im Zwielicht",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:82,author:"Jens Henrik Jensen",series:"SØG",band:1,title:"Das Axtschiff",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:83,author:"Jens Henrik Jensen",series:"SØG",band:2,title:"Der Kohlenmann",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:84,author:"Jens Henrik Jensen",series:"SØG",band:3,title:"Der Geist",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:85,author:"JM Dalgliesh",series:"Hidden Norfolk",band:6,title:"Fatale Zufälle",genre:"Krimi",fav:false,rating:0,note:""},
-{id:86,author:"JM Dalgliesh",series:"Hidden Norfolk",band:7,title:"Gefährliche Fassade",genre:"Krimi",fav:false,rating:0,note:""},
-{id:87,author:"JM Dalgliesh",series:"Hidden Norfolk",band:8,title:"Ein finsteres Geheimnis",genre:"Krimi",fav:false,rating:0,note:""},
-{id:88,author:"JM Dalgliesh",series:"Hidden Norfolk",band:9,title:"Tödliche Liebe",genre:"Krimi",fav:false,rating:0,note:""},
-{id:89,author:"JM Dalgliesh",series:"Hidden Norfolk",band:10,title:"Zwei Leben",genre:"Krimi",fav:false,rating:0,note:""},
-{id:90,author:"JM Dalgliesh",series:"Hidden Norfolk",band:12,title:"Falscher Anschein",genre:"Krimi",fav:false,rating:0,note:""},
-{id:91,author:"JM Dalgliesh",series:"Hidden Norfolk",band:13,title:"Die Sünden der Väter",genre:"Krimi",fav:false,rating:0,note:""},
-{id:92,author:"JM Dalgliesh",series:"Hidden Norfolk",band:15,title:"Auge um Auge",genre:"Krimi",fav:false,rating:0,note:""},
-{id:93,author:"JM Dalgliesh",series:"Misty Isle",band:1,title:"Das Leben ist kurz",genre:"Krimi",fav:false,rating:0,note:""},
-{id:94,author:"JM Dalgliesh",series:"Misty Isle",band:2,title:"Der Tote am Store",genre:"Krimi",fav:false,rating:0,note:""},
-{id:95,author:"JM Dalgliesh",series:"Misty Isle",band:3,title:"Die Tote von Tales Bay",genre:"Krimi",fav:false,rating:0,note:""},
-{id:96,author:"JM Dalgliesh",series:"Misty Isle",band:4,title:"Tod in den Collins",genre:"Krimi",fav:false,rating:0,note:""},
-{id:97,author:"JM Dalgliesh",series:"Misty Isle",band:5,title:"Tod am Strand von Stephan",genre:"Krimi",fav:false,rating:0,note:""},
-{id:98,author:"Lisa Regan",series:"Josie Quinn",band:1,title:"Josie Quinn Bd. 1-22",genre:"Thriller",fav:false,rating:0,note:""},
-{id:99,author:"Lisa Regan",series:"Detective Parks",band:1,title:"Die gefangenen Mädchen",genre:"Thriller",fav:false,rating:0,note:""},
-{id:100,author:"Lisa Regan",series:"Detective Parks",band:2,title:"Die tote Mutter",genre:"Thriller",fav:false,rating:0,note:""},
-{id:101,author:"Elias Haller",series:"Arne Stiller",band:1,title:"Der Kryptologe",genre:"Thriller",fav:false,rating:0,note:""},
-{id:102,author:"Elias Haller",series:"Arne Stiller",band:2,title:"Die Chiffre",genre:"Thriller",fav:false,rating:0,note:""},
-{id:103,author:"Elias Haller",series:"Arne Stiller",band:3,title:"Das Zeichen",genre:"Thriller",fav:false,rating:0,note:""},
-{id:104,author:"Elias Haller",series:"Arne Stiller",band:4,title:"Der Rätselmann",genre:"Thriller",fav:false,rating:0,note:""},
-{id:105,author:"Elias Haller",series:"Arne Stiller",band:5,title:"Die Schrift",genre:"Thriller",fav:false,rating:0,note:""},
-{id:106,author:"Elias Haller",series:"Arne Stiller",band:6,title:"Das Quadrat",genre:"Thriller",fav:false,rating:0,note:""},
-{id:107,author:"Elias Haller",series:"Arne Stiller",band:7,title:"Der Seher",genre:"Thriller",fav:false,rating:0,note:""},
-{id:108,author:"Elias Haller",series:"Arne Stiller",band:8,title:"Die Sättigung",genre:"Thriller",fav:false,rating:0,note:""},
-{id:109,author:"Elias Haller",series:"Grimm Trilogie",band:1,title:"Rotkäppchen lügt",genre:"Thriller",fav:false,rating:0,note:""},
-{id:110,author:"Elias Haller",series:"Grimm Trilogie",band:2,title:"Vöglein schweigt",genre:"Thriller",fav:false,rating:0,note:""},
-{id:111,author:"Elias Haller",series:"Grimm Trilogie",band:3,title:"Schneeweißchen stirbt",genre:"Thriller",fav:false,rating:0,note:""},
-{id:112,author:"Elias Haller",series:"Tara Kronberg",band:1,title:"Signal Rot",genre:"Thriller",fav:false,rating:0,note:""},
-{id:113,author:"Elias Haller",series:"Tara Kronberg",band:2,title:"Todesstimme",genre:"Thriller",fav:false,rating:0,note:""},
-{id:114,author:"Elias Haller",series:"Tara Kronberg",band:3,title:"Die Blutmacher",genre:"Thriller",fav:false,rating:0,note:""},
-{id:115,author:"Elias Haller",series:"Tara Kronberg",band:4,title:"Der Handsammler",genre:"Thriller",fav:false,rating:0,note:""},
-{id:116,author:"Elias Haller",series:"Klara Frost",band:1,title:"Der Augenmacher",genre:"Thriller",fav:false,rating:0,note:""},
-{id:117,author:"Elias Haller",series:"Klara Frost",band:2,title:"Todesschöpfer",genre:"Thriller",fav:false,rating:0,note:""},
-{id:118,author:"Elias Haller",series:"Klara Frost",band:3,title:"Der Seelenhirte",genre:"Thriller",fav:false,rating:0,note:""},
-{id:119,author:"Elias Haller",series:"Klara Frost",band:4,title:"Der Lucifer Killer",genre:"Thriller",fav:false,rating:0,note:""},
-{id:120,author:"Robert Dugoni",series:"Tracy Crosswhite",band:1,title:"Tracy Crosswhite Bd. 1-11",genre:"Thriller",fav:false,rating:0,note:""},
-{id:121,author:"Benjamin Cors",series:"Mila & Jakob",band:1,title:"Krähentage",genre:"Krimi",fav:false,rating:0,note:""},
-{id:122,author:"Benjamin Cors",series:"Mila & Jakob",band:2,title:"Nebelbeutel",genre:"Krimi",fav:false,rating:0,note:""},
-{id:123,author:"Helen Phifer",series:"Lucy Harwon",band:1,title:"Düsteres Haus",genre:"Thriller",fav:false,rating:0,note:""},
-{id:124,author:"Helen Phifer",series:"Lucy Harwon",band:2,title:"Letzter Atemzug",genre:"Thriller",fav:false,rating:0,note:""},
-{id:125,author:"Helen Phifer",series:"Detective Morgan Brooks",band:1,title:"Detective Morgan Brooks Bd. 1-8",genre:"Thriller",fav:false,rating:0,note:""},
-{id:126,author:"Ingar Johnrud",series:"Benjamin & Tong",band:1,title:"Echokammer",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:127,author:"Ingar Johnrud",series:"Benjamin & Tong",band:2,title:"Blindfeuer",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:128,author:"Ingar Johnrud",series:"",band:1,title:"Der Hirte",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:129,author:"Ingar Johnrud",series:"",band:2,title:"Der Bote",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:130,author:"Ingar Johnrud",series:"",band:3,title:"Der Verräter",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:131,author:"Michael Jensen",series:"Jens Druwe",band:1,title:"Totenland",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:132,author:"Michael Jensen",series:"Jens Druwe",band:2,title:"Totenwelt",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:133,author:"Michael Jensen",series:"Jens Druwe",band:3,title:"Totenreich",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:134,author:"Gunnar Schwarz",series:"Kurz & Schünemann",band:1,title:"Und Tod bist du",genre:"Krimi",fav:false,rating:0,note:""},
-{id:135,author:"Gunnar Schwarz",series:"Kurz & Schünemann",band:2,title:"Der Narbenschneider",genre:"Krimi",fav:false,rating:0,note:""},
-{id:136,author:"Ilona Bulazel",series:"",band:1,title:"Trauerherlt",genre:"Krimi",fav:false,rating:0,note:""},
-{id:137,author:"Ilona Bulazel",series:"",band:2,title:"Blutschlucht",genre:"Krimi",fav:false,rating:0,note:""},
-{id:138,author:"Carla Kovach",series:"Detective Gina Harte",band:1,title:"Detective Gina Harte Bd. 1-12",genre:"Thriller",fav:false,rating:0,note:""},
-{id:139,author:"Roger Stelljes",series:"Agent Tori Hunter",band:1,title:"Die Minnesota Verschwörung",genre:"Thriller",fav:false,rating:0,note:""},
-{id:140,author:"Roger Stelljes",series:"Agent Tori Hunter",band:2,title:"Mörderisches Stillwater",genre:"Thriller",fav:false,rating:0,note:""},
-{id:141,author:"Viveca Sten",series:"Thomas & Andrea",band:1,title:"Kalt und still",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:142,author:"Viveca Sten",series:"Thomas & Andrea",band:2,title:"Tief im Schatten",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:143,author:"Tibor Rode",series:"",band:1,title:"Lupus",genre:"Thriller",fav:false,rating:0,note:""},
-{id:144,author:"Tibor Rode",series:"",band:2,title:"Das Morpheus Gen",genre:"Thriller",fav:false,rating:0,note:""},
-{id:145,author:"Frank Hagedorn",series:"Paula Osterholz",band:1,title:"Wölfe von Potsdam",genre:"Krimi",fav:false,rating:0,note:""},
-{id:146,author:"Frank Hagedorn",series:"Paula Osterholz",band:2,title:"Teufel von Potsdam",genre:"Krimi",fav:false,rating:0,note:""},
-{id:147,author:"Frank Hagedorn",series:"Paula Osterholz",band:3,title:"Schatten von Potsdam",genre:"Krimi",fav:false,rating:0,note:""},
-{id:148,author:"M.S. Morris",series:"Bridget Hart",band:1,title:"Bridget Hart Bd. 1-7",genre:"Krimi",fav:false,rating:0,note:""},
-{id:149,author:"M.S. Morris",series:"Tom Raven",band:1,title:"Tom Raven Bd. 1-4",genre:"Krimi",fav:false,rating:0,note:""},
-{id:150,author:"Rita Herron",series:"Elli Reeves",band:1,title:"Elli Reeves Bd. 1-7",genre:"Thriller",fav:false,rating:0,note:""},
-{id:151,author:"Catherine Shepard",series:"Laura Kern",band:1,title:"Laura Kern Bd. 1-10",genre:"Krimi",fav:false,rating:0,note:""},
-{id:152,author:"Caroline Arnold",series:"Amanda Steele",band:1,title:"Das kleine Grab",genre:"Thriller",fav:false,rating:0,note:""},
-{id:153,author:"Caroline Arnold",series:"Amanda Steele",band:2,title:"Die gestohlenen Töchter",genre:"Thriller",fav:false,rating:0,note:""},
-{id:154,author:"Caroline Arnold",series:"Amanda Steele",band:3,title:"Die schweigende Zeugin",genre:"Thriller",fav:false,rating:0,note:""},
-{id:155,author:"Camilla Läckberg",series:"Dabiri Walder Trilogie",band:1,title:"Schwarzlicht",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:156,author:"Camilla Läckberg",series:"Dabiri Walder Trilogie",band:2,title:"Finsterer Nebel",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:157,author:"Camilla Läckberg",series:"Dabiri Walder Trilogie",band:3,title:"Nachtwasser",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:158,author:"Camilla Läckberg",series:"Erika Falk",band:1,title:"Kuckuckskinder",genre:"Nordischer Krimi",fav:false,rating:0,note:""},
-{id:159,author:"Tracy Clarke",series:"Harriet Foster",band:1,title:"Das Böse dahinter",genre:"Thriller",fav:false,rating:0,note:""},
-{id:160,author:"Tracy Clarke",series:"Harriet Foster",band:2,title:"Nichts vergeht",genre:"Thriller",fav:false,rating:0,note:""},
-{id:161,author:"Willow Rose",series:"Detective Billy Anne Wild",band:1,title:"Lass sie nicht los",genre:"Thriller",fav:false,rating:0,note:""},
-{id:162,author:"Willow Rose",series:"Detective Billy Anne Wild",band:2,title:"Dann verschwand sie",genre:"Thriller",fav:false,rating:0,note:""},
-{id:163,author:"Willow Rose",series:"Detective Billy Anne Wild",band:3,title:"In ihrem Grab",genre:"Thriller",fav:false,rating:0,note:""},
-{id:164,author:"Melinda Leigh",series:"Morgan Dane",band:1,title:"Morgan Dane Bd. 1-6",genre:"Thriller",fav:false,rating:0,note:""},
-{id:165,author:"Steffen Weihnart",series:"",band:1,title:"Der Fall der Katharina S.",genre:"Krimi",fav:false,rating:0,note:""},
-{id:166,author:"Steffen Weihnart",series:"",band:2,title:"Dunkle Enthüllungen",genre:"Krimi",fav:false,rating:0,note:""},
-{id:167,author:"Steffen Weihnart",series:"",band:3,title:"Fleisch und Blut",genre:"Krimi",fav:false,rating:0,note:""},
-{id:168,author:"Rose Pascoe",series:"",band:1,title:"Mord im Teufelsviertel",genre:"Krimi",fav:false,rating:0,note:""},
-{id:169,author:"Bernhard Stäber",series:"",band:1,title:"Kalt für die Nacht",genre:"Krimi",fav:false,rating:0,note:""},
-{id:170,author:"Andreas Gruber",series:"Herz-Reihe",band:1,title:"Herzgrab",genre:"Thriller",fav:false,rating:0,note:""},
-{id:171,author:"Andreas Gruber",series:"Herz-Reihe",band:2,title:"Herzfluch",genre:"Thriller",fav:false,rating:0,note:""},
-{id:172,author:"Andreas Gruber",series:"Schwarze Dame",band:1,title:"Die schwarze Dame",genre:"Thriller",fav:false,rating:0,note:""},
-{id:173,author:"Andreas Gruber",series:"Schwarze Dame",band:2,title:"Die Engelsmühle",genre:"Thriller",fav:false,rating:0,note:""},
-{id:174,author:"Andreas Gruber",series:"Schwarze Dame",band:3,title:"Die Knochennadel",genre:"Thriller",fav:false,rating:0,note:""},
-{id:175,author:"Andreas Gruber",series:"Rache",band:1,title:"Rachesommer",genre:"Thriller",fav:false,rating:0,note:""},
-{id:176,author:"Andreas Gruber",series:"Rache",band:2,title:"Racheherbst",genre:"Thriller",fav:false,rating:0,note:""},
-{id:177,author:"Andreas Gruber",series:"Rache",band:3,title:"Rachewinter",genre:"Thriller",fav:false,rating:0,note:""},
-{id:178,author:"Andreas Gruber",series:"Rache",band:4,title:"Rachefrühling",genre:"Thriller",fav:false,rating:0,note:""},
-{id:179,author:"Andreas Gruber",series:"Todes-Reihe",band:1,title:"Todesfrist",genre:"Thriller",fav:false,rating:0,note:""},
-{id:180,author:"Andreas Gruber",series:"Todes-Reihe",band:2,title:"Todesurteil",genre:"Thriller",fav:false,rating:0,note:""},
-{id:181,author:"Andreas Gruber",series:"Todes-Reihe",band:3,title:"Todesmärchen",genre:"Thriller",fav:false,rating:0,note:""},
-{id:182,author:"Andreas Gruber",series:"Todes-Reihe",band:4,title:"Todesreiter",genre:"Thriller",fav:false,rating:0,note:""},
-{id:183,author:"Andreas Gruber",series:"Todes-Reihe",band:5,title:"Todesmahl",genre:"Thriller",fav:false,rating:0,note:""},
-{id:184,author:"Andreas Gruber",series:"Todes-Reihe",band:6,title:"Todesschmerz",genre:"Thriller",fav:false,rating:0,note:""},
-{id:185,author:"Andreas Gruber",series:"Todes-Reihe",band:7,title:"Todesrache",genre:"Thriller",fav:false,rating:0,note:""},
-{id:186,author:"Andreas Gruber",series:"Todes-Reihe",band:8,title:"Todesspur",genre:"Thriller",fav:false,rating:0,note:""}
+{"id": 1, "author": "Kendra Elliott", "series": "Callahan & McLane", "band": 1, "title": "Verschwunden", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 2, "author": "Kendra Elliott", "series": "Callahan & McLane", "band": 2, "title": "Verbunden", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 3, "author": "Kendra Elliott", "series": "Callahan & McLane", "band": 3, "title": "Abgestürzt", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 4, "author": "Kendra Elliott", "series": "Callahan & McLane", "band": 4, "title": "Im Visier", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 5, "author": "Kendra Elliott", "series": "Columbia River", "band": 1, "title": "Die verschollene Schwester", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 6, "author": "Kendra Elliott", "series": "Columbia River", "band": 2, "title": "Die verhängnisvolle Stille", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 7, "author": "Kendra Elliott", "series": "Columbia River", "band": 3, "title": "Die verzweifelte Suche", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 8, "author": "Kendra Elliott", "series": "Bone Secrets", "band": 1, "title": "Verdeckt", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 9, "author": "Kendra Elliott", "series": "Bone Secrets", "band": 2, "title": "Vereist", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 10, "author": "Kendra Elliott", "series": "Bone Secrets", "band": 3, "title": "Verscharrt", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 11, "author": "Kendra Elliott", "series": "Bone Secrets", "band": 4, "title": "Verraten", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 12, "author": "Kendra Elliott", "series": "Bone Secrets", "band": 5, "title": "Verbrannt", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 13, "author": "Kendra Elliott", "series": "Mercy Kill Patrick", "band": 1, "title": "Erbarme dich ihrer", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 14, "author": "Kendra Elliott", "series": "Mercy Kill Patrick", "band": 2, "title": "Erkenne die Wahrheit", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 15, "author": "Kendra Elliott", "series": "Mercy Kill Patrick", "band": 3, "title": "Verzeiht meine Sünden", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 16, "author": "Melinda Leigh", "series": "Bree Taggert", "band": 1, "title": "Dunkle Last", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 17, "author": "Melinda Leigh", "series": "Bree Taggert", "band": 2, "title": "Eisige Wut", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 18, "author": "Melinda Leigh", "series": "Bree Taggert", "band": 3, "title": "Teuflische Gier", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 19, "author": "Melinda Leigh", "series": "Bree Taggert", "band": 4, "title": "Tödliches Leid", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 20, "author": "Ben Tomasson", "series": "", "band": 1, "title": "Forsberg und das verschwundene Mädchen", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 21, "author": "Ben Tomasson", "series": "", "band": 2, "title": "Der Tote von Asperö", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 22, "author": "Ben Tomasson", "series": "", "band": 3, "title": "Der Teufel von Björnlanda", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 23, "author": "Ben Tomasson", "series": "", "band": 4, "title": "Die Schatten von Trollhädan", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 24, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 1, "title": "Die Springflut", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 25, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 2, "title": "Die dritte Stimme", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 26, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 3, "title": "Strömung", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 27, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 4, "title": "Schlaflied", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 28, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 5, "title": "Wundbrand", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 29, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 6, "title": "Kaltes Gold", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 30, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 7, "title": "Der gute Samariter", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 31, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 8, "title": "Das Auge der Nacht", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 32, "author": "Cilla Börjlind", "series": "Olivia Ronning & Tom Stilton", "band": 9, "title": "Schatten über dem Wald", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 33, "author": "Volker Gerling", "series": "Laura Graf", "band": 1, "title": "Der Perfektionist", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 34, "author": "Volker Gerling", "series": "Laura Graf", "band": 2, "title": "Die Schuldigen", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 35, "author": "Volker Gerling", "series": "Laura Graf", "band": 3, "title": "Der Seelsorger", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 36, "author": "Andrea Penrose", "series": "Wrexford & Sloane", "band": 1, "title": "Der Tote in der Black Swan Lane", "genre": "Historisch", "fav": false, "rating": 0, "note": ""},
+{"id": 37, "author": "Andrea Penrose", "series": "Wrexford & Sloane", "band": 3, "title": "Schatten über Kensington Palace", "genre": "Historisch", "fav": false, "rating": 0, "note": ""},
+{"id": 38, "author": "Lloreth Anne White", "series": "", "band": 1, "title": "Die Geheimnisse der anderen", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 39, "author": "Lloreth Anne White", "series": "", "band": 2, "title": "In dunkler Tiefe", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 40, "author": "Lloreth Anne White", "series": "", "band": 3, "title": "Mädchen Fang", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 41, "author": "Lloreth Anne White", "series": "", "band": 4, "title": "Mädchen Grab", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 42, "author": "Catherine Shepard", "series": "Zons-Reihe", "band": 1, "title": "Düsteres Wasser", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 43, "author": "Catherine Shepard", "series": "Zons-Reihe", "band": 2, "title": "Das Wiegenlied", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 44, "author": "Catherine Shepard", "series": "Zons-Reihe", "band": 3, "title": "Dunkle Botschaft", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 45, "author": "Catherine Shepard", "series": "Zons-Reihe", "band": 4, "title": "Das Verbot", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 46, "author": "Catherine Shepard", "series": "Zons-Reihe", "band": 5, "title": "Das Geheimnis der toten Mädchen", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 47, "author": "Samuel Björk", "series": "", "band": 1, "title": "Dunkler Schnee", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 48, "author": "Samuel Björk", "series": "", "band": 2, "title": "Engelsskald", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 49, "author": "Samuel Björk", "series": "", "band": 3, "title": "Federgrab", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 50, "author": "Samuel Björk", "series": "", "band": 4, "title": "Bitterer Abschied", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 51, "author": "Samuel Björk", "series": "", "band": 5, "title": "Kräheninsel", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 52, "author": "Andreas Winkelmann", "series": "", "band": 1, "title": "Das letzte was du hörst", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 53, "author": "Andreas Winkelmann", "series": "", "band": 2, "title": "Nicht ein Wort zu viel", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 54, "author": "Andreas Winkelmann", "series": "", "band": 3, "title": "Moorland", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 55, "author": "Mark Dawson", "series": "Isabella Rose", "band": 1, "title": "Der Engel", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 56, "author": "Mark Dawson", "series": "Isabella Rose", "band": 2, "title": "Die Agentin", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 57, "author": "Mark Dawson", "series": "Isabella Rose", "band": 3, "title": "Kundschafterin", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 58, "author": "Mark Dawson", "series": "Isabella Rose", "band": 4, "title": "Killerin", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 59, "author": "Mark Dawson", "series": "Isabella Rose", "band": 5, "title": "Richterin", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 60, "author": "Mark Dawson", "series": "Atticus Priest", "band": 1, "title": "Das Haus im Wald", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 61, "author": "Mark Dawson", "series": "Atticus Priest", "band": 2, "title": "Friedhof für Fremde", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 62, "author": "Mark Dawson", "series": "Atticus Priest", "band": 3, "title": "Das rote Zimmer", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 63, "author": "Mark Dawson", "series": "Atticus Priest", "band": 4, "title": "Und alle Teufel", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 64, "author": "Mark Dawson", "series": "Atticus Priest", "band": 5, "title": "Das Erbe", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 65, "author": "Mark Franley", "series": "David Bender & Katharina Adler", "band": 1, "title": "Treibsand", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 66, "author": "Mark Franley", "series": "David Bender & Katharina Adler", "band": 2, "title": "Irrlicht", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 67, "author": "Mark Franley", "series": "David Bender & Katharina Adler", "band": 3, "title": "Ihr Kinderlein kommet", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 68, "author": "Mark Franley", "series": "David Bender & Katharina Adler", "band": 4, "title": "Das Haus im Wald", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 69, "author": "Christophe Villain", "series": "Sandrine Perrot", "band": 1, "title": "Die Tote auf dem Zöllnerweg", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 70, "author": "Christophe Villain", "series": "Sandrine Perrot", "band": 2, "title": "Die Tote von Saint Malo", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 71, "author": "Christophe Villain", "series": "Sandrine Perrot", "band": 3, "title": "Das Grab in der Ardeche", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 72, "author": "Christophe Villain", "series": "Sandrine Perrot", "band": 4, "title": "Der Tote aus der Büherstadt", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 73, "author": "Christophe Villain", "series": "Sandrine Perrot", "band": 5, "title": "Der Tote in der Mühle", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 74, "author": "Christophe Villain", "series": "Sandrine Perrot", "band": 6, "title": "Der Tote in der Burg", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 75, "author": "Christophe Villain", "series": "Kommissar Armand & David", "band": 1, "title": "Das Grab in der Ade", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 76, "author": "Christophe Villain", "series": "Kommissar Armand & David", "band": 2, "title": "Mord in der Unterwelt", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 77, "author": "Christophe Villain", "series": "Kommissar Armand & David", "band": 3, "title": "Das Teil der Wölfe", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 78, "author": "Christophe Villain", "series": "Kommissar Armand & David", "band": 4, "title": "Verhängnisvolles Carcassonne", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 79, "author": "Jens Henrik Jensen", "series": "East", "band": 1, "title": "Welt ohne Seele", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 80, "author": "Jens Henrik Jensen", "series": "East", "band": 2, "title": "Auf tiefem Grund", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 81, "author": "Jens Henrik Jensen", "series": "East", "band": 3, "title": "Jagd im Zwielicht", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 82, "author": "Jens Henrik Jensen", "series": "SOG", "band": 1, "title": "Das Axtschiff", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 83, "author": "Jens Henrik Jensen", "series": "SOG", "band": 2, "title": "Der Kohlenmann", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 84, "author": "Jens Henrik Jensen", "series": "SOG", "band": 3, "title": "Der Geist", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 85, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 6, "title": "Fatale Zufälle", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 86, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 7, "title": "Gefährliche Fassade", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 87, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 8, "title": "Ein finsteres Geheimnis", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 88, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 9, "title": "Tödliche Liebe", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 89, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 10, "title": "Zwei Leben", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 90, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 12, "title": "Falscher Anschein", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 91, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 13, "title": "Die Sünden der Väter", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 92, "author": "JM Dalgliesh", "series": "Hidden Norfolk", "band": 15, "title": "Auge um Auge", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 93, "author": "JM Dalgliesh", "series": "Misty Isle", "band": 1, "title": "Das Leben ist kurz", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 94, "author": "JM Dalgliesh", "series": "Misty Isle", "band": 2, "title": "Der Tote am Store", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 95, "author": "JM Dalgliesh", "series": "Misty Isle", "band": 3, "title": "Die Tote von Tales Bay", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 96, "author": "JM Dalgliesh", "series": "Misty Isle", "band": 4, "title": "Tod in den Collins", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 97, "author": "JM Dalgliesh", "series": "Misty Isle", "band": 5, "title": "Tod am Strand von Stephan", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 98, "author": "Lisa Regan", "series": "Josie Quinn", "band": 1, "title": "Josie Quinn Bd. 1-22", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 99, "author": "Lisa Regan", "series": "Detective Parks", "band": 1, "title": "Die gefangenen Mädchen", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 100, "author": "Lisa Regan", "series": "Detective Parks", "band": 2, "title": "Die tote Mutter", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 101, "author": "Elias Haller", "series": "Arne Stiller", "band": 1, "title": "Der Kryptologe", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 102, "author": "Elias Haller", "series": "Arne Stiller", "band": 2, "title": "Die Chiffre", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 103, "author": "Elias Haller", "series": "Arne Stiller", "band": 3, "title": "Das Zeichen", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 104, "author": "Elias Haller", "series": "Arne Stiller", "band": 4, "title": "Der Rätselmann", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 105, "author": "Elias Haller", "series": "Arne Stiller", "band": 5, "title": "Die Schrift", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 106, "author": "Elias Haller", "series": "Arne Stiller", "band": 6, "title": "Das Quadrat", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 107, "author": "Elias Haller", "series": "Arne Stiller", "band": 7, "title": "Der Seher", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 108, "author": "Elias Haller", "series": "Arne Stiller", "band": 8, "title": "Die Sättigung", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 109, "author": "Elias Haller", "series": "Grimm Trilogie", "band": 1, "title": "Rotkäppchen lügt", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 110, "author": "Elias Haller", "series": "Grimm Trilogie", "band": 2, "title": "Vöglein schweigt", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 111, "author": "Elias Haller", "series": "Grimm Trilogie", "band": 3, "title": "Schneweißchen stirbt", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 112, "author": "Elias Haller", "series": "Tara Kronberg", "band": 1, "title": "Signal Rot", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 113, "author": "Elias Haller", "series": "Tara Kronberg", "band": 2, "title": "Todesstimme", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 114, "author": "Elias Haller", "series": "Tara Kronberg", "band": 3, "title": "Die Blutmacher", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 115, "author": "Elias Haller", "series": "Tara Kronberg", "band": 4, "title": "Der Handsammler", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 116, "author": "Elias Haller", "series": "Klara Frost", "band": 1, "title": "Der Augenmacher", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 117, "author": "Elias Haller", "series": "Klara Frost", "band": 2, "title": "Todesschöpfer", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 118, "author": "Elias Haller", "series": "Klara Frost", "band": 3, "title": "Der Seelenhirte", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 119, "author": "Elias Haller", "series": "Klara Frost", "band": 4, "title": "Der Lucifer Killer", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 120, "author": "Robert Dugoni", "series": "Tracy Crosswhite", "band": 1, "title": "Tracy Crosswhite Bd. 1-11", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 121, "author": "Benjamin Cors", "series": "Mila & Jakob", "band": 1, "title": "Krähentage", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 122, "author": "Benjamin Cors", "series": "Mila & Jakob", "band": 2, "title": "Nebelbeutel", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 123, "author": "Helen Phifer", "series": "Lucy Harwon", "band": 1, "title": "Düsteres Haus", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 124, "author": "Helen Phifer", "series": "Lucy Harwon", "band": 2, "title": "Letzter Atemzug", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 125, "author": "Helen Phifer", "series": "Detective Morgan Brooks", "band": 1, "title": "Detective Morgan Brooks Bd. 1-8", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 126, "author": "Ingar Johnrud", "series": "Benjamin & Tong", "band": 1, "title": "Echokammer", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 127, "author": "Ingar Johnrud", "series": "Benjamin & Tong", "band": 2, "title": "Blindfeuer", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 128, "author": "Ingar Johnrud", "series": "", "band": 1, "title": "Der Hirte", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 129, "author": "Ingar Johnrud", "series": "", "band": 2, "title": "Der Bote", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 130, "author": "Ingar Johnrud", "series": "", "band": 3, "title": "Der Verräter", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 131, "author": "Michael Jensen", "series": "Jens Druwe", "band": 1, "title": "Totenland", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 132, "author": "Michael Jensen", "series": "Jens Druwe", "band": 2, "title": "Totenwelt", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 133, "author": "Michael Jensen", "series": "Jens Druwe", "band": 3, "title": "Totenreich", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 134, "author": "Gunnar Schwarz", "series": "Kurz & Schünemann", "band": 1, "title": "Und Tod bist du", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 135, "author": "Gunnar Schwarz", "series": "Kurz & Schünemann", "band": 2, "title": "Der Narbenschneider", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 136, "author": "Ilona Bulazel", "series": "", "band": 1, "title": "Trauerherlt", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 137, "author": "Ilona Bulazel", "series": "", "band": 2, "title": "Blutschlucht", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 138, "author": "Carla Kovach", "series": "Detective Gina Harte", "band": 1, "title": "Detective Gina Harte Bd. 1-12", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 139, "author": "Roger Stelljes", "series": "Agent Tori Hunter", "band": 1, "title": "Die Minnesota Verschwörung", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 140, "author": "Roger Stelljes", "series": "Agent Tori Hunter", "band": 2, "title": "Mörderisches Stillwater", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 141, "author": "Viveca Sten", "series": "Thomas & Andrea", "band": 1, "title": "Kalt und still", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 142, "author": "Viveca Sten", "series": "Thomas & Andrea", "band": 2, "title": "Tief im Schatten", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 143, "author": "Tibor Rode", "series": "", "band": 1, "title": "Lupus", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 144, "author": "Tibor Rode", "series": "", "band": 2, "title": "Das Morpheus Gen", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 145, "author": "Frank Hagedorn", "series": "Paula Osterholz", "band": 1, "title": "Wölfe von Potsdam", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 146, "author": "Frank Hagedorn", "series": "Paula Osterholz", "band": 2, "title": "Teufel von Potsdam", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 147, "author": "Frank Hagedorn", "series": "Paula Osterholz", "band": 3, "title": "Schatten von Potsdam", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 148, "author": "M.S. Morris", "series": "Bridget Hart", "band": 1, "title": "Bridget Hart Bd. 1-7", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 149, "author": "M.S. Morris", "series": "Tom Raven", "band": 1, "title": "Tom Raven Bd. 1-4", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 150, "author": "Rita Herron", "series": "Elli Reeves", "band": 1, "title": "Elli Reeves Bd. 1-7", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 151, "author": "Catherine Shepard", "series": "Laura Kern", "band": 1, "title": "Laura Kern Bd. 1-10", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 152, "author": "Caroline Arnold", "series": "Amanda Steele", "band": 1, "title": "Das kleine Grab", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 153, "author": "Caroline Arnold", "series": "Amanda Steele", "band": 2, "title": "Die gestohlenen Töchter", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 154, "author": "Caroline Arnold", "series": "Amanda Steele", "band": 3, "title": "Die schweigende Zeugin", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 155, "author": "Camilla Läckberg", "series": "Dabiri Walder Trilogie", "band": 1, "title": "Schwarzlicht", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 156, "author": "Camilla Läckberg", "series": "Dabiri Walder Trilogie", "band": 2, "title": "Finsterer Nebel", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 157, "author": "Camilla Läckberg", "series": "Dabiri Walder Trilogie", "band": 3, "title": "Nachtwasser", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 158, "author": "Camilla Läckberg", "series": "Erika Falk", "band": 1, "title": "Kuckuckskinder", "genre": "Nordischer Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 159, "author": "Tracy Clarke", "series": "Harriet Foster", "band": 1, "title": "Das Böse dahinter", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 160, "author": "Tracy Clarke", "series": "Harriet Foster", "band": 2, "title": "Nichts vergeht", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 161, "author": "Willow Rose", "series": "Detective Billy Anne Wild", "band": 1, "title": "Lass sie nicht los", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 162, "author": "Willow Rose", "series": "Detective Billy Anne Wild", "band": 2, "title": "Dann verschwand sie", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 163, "author": "Willow Rose", "series": "Detective Billy Anne Wild", "band": 3, "title": "In ihrem Grab", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 164, "author": "Melinda Leigh", "series": "Morgan Dane", "band": 1, "title": "Morgan Dane Bd. 1-6", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 165, "author": "Steffen Weihnart", "series": "", "band": 1, "title": "Der Fall der Katharina S.", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 166, "author": "Steffen Weihnart", "series": "", "band": 2, "title": "Dunkle Enthüllungen", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 167, "author": "Steffen Weihnart", "series": "", "band": 3, "title": "Fleisch und Blut", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 168, "author": "Rose Pascoe", "series": "", "band": 1, "title": "Mord im Teufelsviertel", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 169, "author": "Bernhard Stäber", "series": "", "band": 1, "title": "Kalt für die Nacht", "genre": "Krimi", "fav": false, "rating": 0, "note": ""},
+{"id": 170, "author": "Andreas Gruber", "series": "Herz-Reihe", "band": 1, "title": "Herzgrab", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 171, "author": "Andreas Gruber", "series": "Herz-Reihe", "band": 2, "title": "Herzfluch", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 172, "author": "Andreas Gruber", "series": "Schwarze Dame", "band": 1, "title": "Die schwarze Dame", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 173, "author": "Andreas Gruber", "series": "Schwarze Dame", "band": 2, "title": "Die Engelsmühle", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 174, "author": "Andreas Gruber", "series": "Schwarze Dame", "band": 3, "title": "Die Knochennadel", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 175, "author": "Andreas Gruber", "series": "Rache", "band": 1, "title": "Rachesommer", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 176, "author": "Andreas Gruber", "series": "Rache", "band": 2, "title": "Racheherbst", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 177, "author": "Andreas Gruber", "series": "Rache", "band": 3, "title": "Rachewinter", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 178, "author": "Andreas Gruber", "series": "Rache", "band": 4, "title": "Rachefrühjahr", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 179, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 1, "title": "Todesfrist", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 180, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 2, "title": "Todesurteil", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 181, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 3, "title": "Todesmärchen", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 182, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 4, "title": "Todesreiter", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 183, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 5, "title": "Todesmahl", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 184, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 6, "title": "Todesschmerz", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 185, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 7, "title": "Todesrache", "genre": "Thriller", "fav": false, "rating": 0, "note": ""},
+{"id": 186, "author": "Andreas Gruber", "series": "Todes-Reihe", "band": 8, "title": "Todesspur", "genre": "Thriller", "fav": false, "rating": 0, "note": ""}
 ];
 
 var books = [];
 var currentRating = 0;
 var activeFilter = "Alle";
+var detailCache = {};
 
 function loadBooks() {
   books = BOOKS.slice();
@@ -429,7 +418,7 @@ function genreClass(g) {
 
 function stars(n) {
   var s = "";
-  for (var i = 0; i < n; i++) s += "\u2605";
+  for (var i = 0; i < n; i++) s += "★";
   return s;
 }
 
@@ -447,30 +436,28 @@ function renderBibliothek() {
   for (var i = 0; i < books.length; i++) if (books[i].fav) favCount++;
   var authors = {};
   for (var i = 0; i < books.length; i++) authors[books[i].author] = true;
-  var authorCount = Object.keys(authors).length;
 
   document.getElementById("statsRow").innerHTML =
-    '<div class="stat-card"><div class="stat-num">' + books.length + '</div><div class="stat-label">B\u00fccher</div></div>' +
-    '<div class="stat-card"><div class="stat-num">' + authorCount + '</div><div class="stat-label">Autoren</div></div>' +
-    '<div class="stat-card"><div class="stat-num">' + favCount + '</div><div class="stat-label">Favoriten \u2b50</div></div>';
+    '<div class="stat-card"><div class="stat-num">' + books.length + '</div><div class="stat-label">Bücher</div></div>' +
+    '<div class="stat-card"><div class="stat-num">' + Object.keys(authors).length + '</div><div class="stat-label">Autoren</div></div>' +
+    '<div class="stat-card"><div class="stat-num">' + favCount + '</div><div class="stat-label">Favoriten ⭐</div></div>';
 
   var genres = ["Alle","Krimi","Thriller","Nordischer Krimi","Historisch","Sonstiges"];
   var pillsHtml = "";
   for (var i = 0; i < genres.length; i++) {
-    pillsHtml += '<button class="pill' + (activeFilter === genres[i] ? " active" : "") + '" onclick="setFilter(\'' + genres[i] + '\')">' + genres[i] + '</button>';
+    pillsHtml += '<button class="pill' + (activeFilter === genres[i] ? " active" : "") + '" onclick="setFilter(\"' + genres[i] + '\")">' + genres[i] + '</button>';
   }
   document.getElementById("filterPills").innerHTML = pillsHtml;
 
-  if (filtered.length === 0) {
-    document.getElementById("bookList").innerHTML = '<div class="empty">Keine B\u00fccher gefunden.</div>';
+  if (!filtered.length) {
+    document.getElementById("bookList").innerHTML = '<div class="empty">Keine Bücher gefunden.</div>';
     return;
   }
 
   var authorMap = {};
   for (var i = 0; i < filtered.length; i++) {
-    var b = filtered[i];
-    if (!authorMap[b.author]) authorMap[b.author] = [];
-    authorMap[b.author].push(b);
+    if (!authorMap[filtered[i].author]) authorMap[filtered[i].author] = [];
+    authorMap[filtered[i].author].push(filtered[i]);
   }
 
   var html = "";
@@ -478,35 +465,34 @@ function renderBibliothek() {
   for (var ai = 0; ai < authorList.length; ai++) {
     var author = authorList[ai];
     var ab = authorMap[author];
-    var initials = author.split(" ").map(function(w) { return w[0] || ""; }).slice(0,2).join("").toUpperCase();
+    var parts = author.split(" ");
+    var initials = "";
+    for (var pi = 0; pi < parts.length && pi < 2; pi++) initials += (parts[pi][0] || "");
+    initials = initials.toUpperCase();
 
     var seriesMap = {};
     for (var i = 0; i < ab.length; i++) {
-      var key = ab[i].series || "\u2014";
+      var key = ab[i].series || "—";
       if (!seriesMap[key]) seriesMap[key] = [];
       seriesMap[key].push(ab[i]);
     }
 
     var booksHtml = "";
-    var seriesKeys = Object.keys(seriesMap);
-    for (var si = 0; si < seriesKeys.length; si++) {
-      var skey = seriesKeys[si];
+    var skeys = Object.keys(seriesMap);
+    for (var si = 0; si < skeys.length; si++) {
+      var skey = skeys[si];
       var sbooks = seriesMap[skey];
-      sbooks.sort(function(a,b) { return a.band - b.band; });
-      if (skey !== "\u2014") booksHtml += '<div class="series-title">' + skey + '</div>';
+      sbooks.sort(function(a,b){ return a.band - b.band; });
+      if (skey !== "—") booksHtml += '<div class="series-title">' + skey + '</div>';
       booksHtml += '<div class="books-grid">';
       for (var bi = 0; bi < sbooks.length; bi++) {
         var bk = sbooks[bi];
-        var favClass = "book-fav" + (bk.fav ? " active" : "");
-        booksHtml += '<div class="book-card">' +
-          '<div class="book-num">' + (bk.band || "\u2014") + '</div>' +
-          '<div style="flex:1">' +
-            '<div class="book-title-text">' + bk.title + '</div>' +
-            (bk.rating ? '<div class="book-rating">' + stars(bk.rating) + '</div>' : '') +
-            (bk.note ? '<div class="book-note">' + bk.note + '</div>' : '') +
-          '</div>' +
+        booksHtml += '<div class="book-card" onclick="openDetail(' + bk.id + ')">' +
+          '<div class="book-num">' + (bk.band || "—") + '</div>' +
+          '<div style="flex:1"><div class="book-title-text">' + bk.title + '</div>' +
+          (bk.rating ? '<div class="book-rating">' + stars(bk.rating) + '</div>' : '') + '</div>' +
           '<span class="' + genreClass(bk.genre) + '">' + bk.genre + '</span>' +
-          '<button class="' + favClass + '" onclick="toggleFav(' + bk.id + ',event)">\u2605</button>' +
+          '<button class="book-fav' + (bk.fav ? " active" : "") + '" onclick="event.stopPropagation();toggleFav(' + bk.id + ')">★</button>' +
         '</div>';
       }
       booksHtml += '</div>';
@@ -516,7 +502,7 @@ function renderBibliothek() {
       '<div class="author-header">' +
         '<div class="author-icon">' + initials + '</div>' +
         '<div class="author-name">' + author + '</div>' +
-        '<span class="author-count">' + ab.length + ' B\u00fccher</span>' +
+        '<span class="author-count">' + ab.length + ' Bücher</span>' +
       '</div>' + booksHtml + '</div>';
   }
   document.getElementById("bookList").innerHTML = html;
@@ -525,117 +511,205 @@ function renderBibliothek() {
 function setFilter(g) { activeFilter = g; renderBibliothek(); }
 function applyFilters() { renderBibliothek(); }
 
-function toggleFav(id, e) {
-  if (e) e.stopPropagation();
+function toggleFav(id) {
   for (var i = 0; i < books.length; i++) {
     if (books[i].id === id) {
       books[i].fav = !books[i].fav;
       saveBooks();
-      showToast(books[i].fav ? "\u2b50 Als Favorit markiert" : "\u2606 Favorit entfernt");
+      showToast(books[i].fav ? "⭐ Favorit markiert" : "☆ Favorit entfernt");
       renderBibliothek();
       return;
     }
   }
 }
 
+function openDetail(id) {
+  var book = null;
+  for (var i = 0; i < books.length; i++) if (books[i].id === id) { book = books[i]; break; }
+  if (!book) return;
+
+  var seriesHtml = book.series ? '<div class="d-series">' + book.series + (book.band ? " · Band " + book.band : "") + '</div>' : '';
+  var ratingHtml = book.rating ? '<div class="book-rating" style="margin-bottom:5px">' + stars(book.rating) + '</div>' : '';
+  var noteHtml = book.note ? '<div class="d-note">?? ' + book.note + '</div>' : '';
+
+  document.getElementById("detailContent").innerHTML =
+    '<div class="d-header">' +
+      '<div class="d-cover" id="dCover">??</div>' +
+      '<div style="flex:1">' +
+        '<div class="d-title">' + book.title + '</div>' +
+        '<div class="d-author">' + book.author + '</div>' +
+        seriesHtml + ratingHtml +
+        '<span class="' + genreClass(book.genre) + '">' + book.genre + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<div id="dDesc" class="d-loading">Lade Beschreibung ...</div>' +
+    noteHtml +
+    '<div class="d-btn-row">' +
+      '<button class="d-btn' + (book.fav ? " fav-active" : "") + '" id="dFavBtn" onclick="toggleFavDetail(' + id + ')">' +
+        (book.fav ? "★ Favorit entfernen" : "☆ Als Favorit") +
+      '</button>' +
+      '<button class="d-btn close-btn" onclick="closeDetail()">Schliessen</button>' +
+    '</div>';
+
+  document.getElementById("detailOverlay").style.display = "flex";
+  document.body.style.overflow = "hidden";
+
+  if (detailCache[id]) {
+    applyDetailData(detailCache[id]);
+  } else {
+    loadBookData(book);
+  }
+}
+
+function loadBookData(book) {
+  var xhr = new XMLHttpRequest();
+  var q = encodeURIComponent(book.title + " " + book.author);
+  xhr.open("GET", "https://www.googleapis.com/books/v1/volumes?q=" + q + "&maxResults=3", true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) return;
+    var dDesc = document.getElementById("dDesc");
+    if (!dDesc) return;
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        var cover = "", desc = "";
+        if (data.totalItems > 0) {
+          for (var i = 0; i < data.items.length; i++) {
+            var info = data.items[i].volumeInfo;
+            if (!cover && info.imageLinks) {
+              cover = (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail || "").replace("http://", "https://");
+            }
+            if (!desc && info.description) {
+              desc = info.description;
+              if (desc.length > 450) desc = desc.substring(0, 450) + " ...";
+            }
+            if (cover && desc) break;
+          }
+        }
+        var result = {cover: cover, desc: desc};
+        detailCache[book.id] = result;
+        applyDetailData(result);
+      } catch(e) {
+        dDesc.className = "d-loading";
+        dDesc.textContent = "Fehler beim Laden.";
+      }
+    } else {
+      dDesc.className = "d-loading";
+      dDesc.textContent = "Keine Verbindung.";
+    }
+  };
+  xhr.send();
+}
+
+function applyDetailData(result) {
+  var dCover = document.getElementById("dCover");
+  var dDesc = document.getElementById("dDesc");
+  if (!dCover || !dDesc) return;
+  if (result.cover) {
+    var img = document.createElement("img");
+    img.alt = "Cover";
+    img.onerror = function() { dCover.textContent = "??"; };
+    img.src = result.cover;
+    dCover.innerHTML = "";
+    dCover.appendChild(img);
+  }
+  dDesc.className = result.desc ? "d-desc" : "d-loading";
+  dDesc.textContent = result.desc || "Keine Beschreibung verfügbar.";
+}
+
+function toggleFavDetail(id) {
+  for (var i = 0; i < books.length; i++) {
+    if (books[i].id === id) {
+      books[i].fav = !books[i].fav;
+      saveBooks();
+      var btn = document.getElementById("dFavBtn");
+      if (btn) {
+        btn.className = "d-btn" + (books[i].fav ? " fav-active" : "");
+        btn.textContent = books[i].fav ? "★ Favorit entfernen" : "☆ Als Favorit";
+      }
+      showToast(books[i].fav ? "⭐ Favorit markiert" : "☆ Favorit entfernt");
+      return;
+    }
+  }
+}
+
+function closeDetail() {
+  document.getElementById("detailOverlay").style.display = "none";
+  document.body.style.overflow = "";
+  renderBibliothek();
+}
+
 function renderFavoriten() {
   var favs = [];
   for (var i = 0; i < books.length; i++) if (books[i].fav) favs.push(books[i]);
   if (!favs.length) {
-    document.getElementById("favList").innerHTML = '<div class="empty">Noch keine Favoriten.<br>Markiere B\u00fccher mit \u2605 in der Bibliothek.</div>';
+    document.getElementById("favList").innerHTML = '<div class="empty">Noch keine Favoriten.</div>';
     return;
   }
   var html = "";
   for (var i = 0; i < favs.length; i++) {
     var b = favs[i];
-    html += '<div class="book-card" style="margin-bottom:7px">' +
-      '<div class="book-num">' + (b.band || "\u2014") + '</div>' +
-      '<div style="flex:1">' +
-        '<div class="book-title-text">' + b.title + '</div>' +
-        '<div style="font-size:11px;color:var(--muted)">' + b.author + (b.series ? " \u00b7 " + b.series : "") + '</div>' +
-        (b.rating ? '<div class="book-rating">' + stars(b.rating) + '</div>' : '') +
-      '</div>' +
-      '<span class="' + genreClass(b.genre) + '">' + b.genre + '</span>' +
-    '</div>';
+    html += '<div class="book-card" style="margin-bottom:7px" onclick="openDetail(' + b.id + ')">' +
+      '<div class="book-num">' + (b.band || "—") + '</div>' +
+      '<div style="flex:1"><div class="book-title-text">' + b.title + '</div>' +
+      '<div style="font-size:11px;color:var(--muted)">' + b.author + (b.series ? " · " + b.series : "") + '</div>' +
+      (b.rating ? '<div class="book-rating">' + stars(b.rating) + '</div>' : '') + '</div>' +
+      '<span class="' + genreClass(b.genre) + '">' + b.genre + '</span></div>';
   }
   document.getElementById("favList").innerHTML = html;
 }
 
 function renderTipps() {
-  var genreCounts = {};
+  var gc = {}, ac = {}, total = books.length;
   for (var i = 0; i < books.length; i++) {
-    var g = books[i].genre;
-    genreCounts[g] = (genreCounts[g] || 0) + 1;
+    gc[books[i].genre] = (gc[books[i].genre] || 0) + 1;
+    ac[books[i].author] = (ac[books[i].author] || 0) + 1;
   }
-  var total = books.length;
   document.getElementById("profileTotal").textContent = total;
-
-  var genres = Object.keys(genreCounts).sort(function(a,b) { return genreCounts[b] - genreCounts[a]; });
+  var gkeys = Object.keys(gc).sort(function(a,b){ return gc[b]-gc[a]; });
   var ringHtml = "";
-  for (var i = 0; i < genres.length; i++) {
-    var pct = Math.round(genreCounts[genres[i]] / total * 100);
-    ringHtml += '<div class="profile-tag">' + genres[i] + '<span class="pct">' + pct + '%</span></div>';
+  for (var i = 0; i < gkeys.length; i++) {
+    ringHtml += '<div class="profile-tag">' + gkeys[i] + '<span class="pct">' + Math.round(gc[gkeys[i]]/total*100) + '%</span></div>';
   }
   document.getElementById("profileRing").innerHTML = ringHtml;
-
-  var authorCounts = {};
-  for (var i = 0; i < books.length; i++) {
-    var a = books[i].author;
-    authorCounts[a] = (authorCounts[a] || 0) + 1;
-  }
-  var topAuthors = Object.keys(authorCounts).sort(function(a,b) { return authorCounts[b] - authorCounts[a]; });
-
-  var nordic = Math.round((genreCounts["Nordischer Krimi"] || 0) / total * 100);
-  var tipsHtml =
-    '<div class="tip-item"><span class="tip-emoji">\ud83d\udcd6</span><div class="tip-text"><strong>Deine Nr. 1:</strong> ' + (topAuthors[0] ? topAuthors[0] + " (" + authorCounts[topAuthors[0]] + " B\u00fccher)" : "\u2013") + '. Schau, was dieser Autor noch geschrieben hat!</div></div>' +
-    '<div class="tip-item"><span class="tip-emoji">\ud83c\udf0d</span><div class="tip-text"><strong>Nordischer Krimi</strong> macht ' + nordic + '% deiner Bibliothek aus. Tipp: <em>Jo Nesb\u00f8 (Harry Hole), Jussi Adler-Olsen (Sonderdezernat Q)</em>.</div></div>' +
-    '<div class="tip-item"><span class="tip-emoji">\ud83c\udf1f</span><div class="tip-text">Du liebst <strong>Serien & Reihen</strong>. Tipp: <em>Ann Cleeves (Vera Stanhope / Shetland)</em> \u2013 atmosph\u00e4risch, viele B\u00e4nde.</div></div>' +
-    '<div class="tip-item"><span class="tip-emoji">\ud83d\udcda</span><div class="tip-text">Neue Entdeckung: <strong>Denzil Meyrick (DCI Daley)</strong> \u2013 schottisch, d\u00fcster, fesselnd.</div></div>';
-  document.getElementById("tipsList").innerHTML = tipsHtml;
-
+  var top = Object.keys(ac).sort(function(a,b){ return ac[b]-ac[a]; });
+  document.getElementById("tipsList").innerHTML =
+    '<div class="tip-item"><span class="tip-emoji">??</span><div class="tip-text"><strong>Deine Nr. 1:</strong> ' + (top[0]||"") + ' (' + (ac[top[0]]||0) + ' Bücher). Was hat dieser Autor noch geschrieben?</div></div>' +
+    '<div class="tip-item"><span class="tip-emoji">??</span><div class="tip-text"><strong>Nordischer Krimi</strong>: Tipp: <em>Jo Nesbø (Harry Hole), Jussi Adler-Olsen</em>.</div></div>' +
+    '<div class="tip-item"><span class="tip-emoji">??</span><div class="tip-text">Du liebst <strong>Serien</strong>. Tipp: <em>Ann Cleeves (Shetland)</em>.</div></div>' +
+    '<div class="tip-item"><span class="tip-emoji">??</span><div class="tip-text">Neue Entdeckung: <strong>Denzil Meyrick (DCI Daley)</strong>.</div></div>';
   document.getElementById("mapTips").innerHTML =
-    "\ud83c\uddf8\ud83c\uddea <strong>Schweden:</strong> Cilla B\u00f6rjlind, Samuel Bj\u00f6rk, Ben Tomasson, Camilla L\u00e4ckberg<br>" +
-    "\ud83c\uddf3\ud83c\uddf4 <strong>Norwegen:</strong> Ingar Johnrud<br>" +
-    "\ud83c\udde9\ud83c\uddf0 <strong>D\u00e4nemark:</strong> Jens Henrik Jensen, Michael Jensen<br>" +
-    "\ud83c\udde9\ud83c\uddea <strong>Deutschland:</strong> Elias Haller, Andreas Gruber, Andreas Winkelmann<br>" +
-    "\ud83c\uddec\ud83c\udde7 <strong>Gro\u00dfbritannien:</strong> JM Dalgliesh, M.S. Morris, Helen Phifer, Mark Dawson<br>" +
-    "\ud83c\uddfa\ud83c\uddf8 <strong>USA:</strong> Kendra Elliott, Melinda Leigh, Lisa Regan, Robert Dugoni<br>" +
-    "\ud83c\uddeb\ud83c\uddf7 <strong>Frankreich:</strong> Christophe Villain";
+    "???? <strong>Schweden:</strong> Cilla Börjlind, Samuel Björk, Camilla Läckberg<br>" +
+    "???? <strong>Norwegen:</strong> Ingar Johnrud<br>" +
+    "???? <strong>Dänemark:</strong> Jens Henrik Jensen, Michael Jensen<br>" +
+    "???? <strong>Deutschland:</strong> Elias Haller, Andreas Gruber<br>" +
+    "???? <strong>GB:</strong> JM Dalgliesh, M.S. Morris, Mark Dawson<br>" +
+    "???? <strong>USA:</strong> Kendra Elliott, Melinda Leigh, Lisa Regan<br>" +
+    "???? <strong>Frankreich:</strong> Christophe Villain";
 }
 
 function setRating(v) {
   currentRating = v;
   var btns = document.querySelectorAll(".star-btn");
-  for (var i = 0; i < btns.length; i++) {
-    btns[i].className = "star-btn" + (i < v ? " lit" : "");
-  }
+  for (var i = 0; i < btns.length; i++) btns[i].className = "star-btn" + (i < v ? " lit" : "");
 }
 
 function addBook() {
   var title = document.getElementById("newTitle").value.trim();
   var author = document.getElementById("newAuthor").value.trim();
-  if (!title || !author) { showToast("\u26a0\ufe0f Bitte Titel und Autor eingeben"); return; }
-  var newBook = {
-    id: getNextId(),
-    author: author,
-    series: document.getElementById("newSeries").value.trim(),
-    band: parseInt(document.getElementById("newBand").value) || 1,
-    title: title,
-    genre: document.getElementById("newGenre").value,
-    fav: false,
-    rating: currentRating,
-    note: document.getElementById("newNote").value.trim()
-  };
-  books.push(newBook);
+  if (!title || !author) { showToast("⚠️ Bitte Titel und Autor eingeben"); return; }
+  books.push({id:getNextId(), author:author, series:document.getElementById("newSeries").value.trim(),
+    band:parseInt(document.getElementById("newBand").value)||1, title:title,
+    genre:document.getElementById("newGenre").value, fav:false, rating:currentRating,
+    note:document.getElementById("newNote").value.trim()});
   saveBooks();
   document.getElementById("newTitle").value = "";
   document.getElementById("newAuthor").value = "";
   document.getElementById("newSeries").value = "";
   document.getElementById("newBand").value = "";
   document.getElementById("newNote").value = "";
-  currentRating = 0;
-  setRating(0);
-  showToast("\ud83d\udcda Buch hinzugef\u00fcgt!");
+  currentRating = 0; setRating(0);
+  showToast("?? Buch hinzugefügt!");
 }
 
 function showToast(msg) {
