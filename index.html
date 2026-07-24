@@ -443,11 +443,17 @@ function renderBibliothek() {
     '<div class="stat-card"><div class="stat-num">' + favCount + '</div><div class="stat-label">Favoriten ⭐</div></div>';
 
   var genres = ["Alle","Krimi","Thriller","Nordischer Krimi","Historisch","Sonstiges"];
-  var pillsHtml = "";
+  var pillsEl = document.getElementById("filterPills");
+  pillsEl.innerHTML = "";
   for (var i = 0; i < genres.length; i++) {
-            pillsHtml += '<button class="pill' + (activeFilter === genres[i] ? ' active' : '') + '" data-g="' + genres[i] + '" onclick="setFilter(this.getAttribute(\"data-g\"))">' + genres[i] + '</button>';
+    (function(g) {
+      var btn = document.createElement("button");
+      btn.className = "pill" + (activeFilter === g ? " active" : "");
+      btn.textContent = g;
+      btn.onclick = function() { setFilter(g); };
+      pillsEl.appendChild(btn);
+    })(genres[i]);
   }
-  document.getElementById("filterPills").innerHTML = pillsHtml;
 
   if (!filtered.length) {
     document.getElementById("bookList").innerHTML = '<div class="empty">Keine Bücher gefunden.</div>';
